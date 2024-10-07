@@ -3,8 +3,8 @@ import random
 
 pygame.init()
 
-ANCHO = 800
-ALTO = 700
+ANCHO = 500
+ALTO = 400
 VENTANA = pygame.display.set_mode((ANCHO, ALTO))
 pygame.display.set_caption('Pacman versión Univalle')
 
