@@ -27,18 +27,14 @@ movimientos = [
 laberinto = [
     [Celda(), Celda(), Celda(), Celda(), Celda()],
     [Celda(), Celda('G'), Celda('B'), Celda(), Celda()],
-    [Celda(), Celda('B'), Celda('B'), Celda('P'), Celda()],
+    [Celda('E'), Celda('B'), Celda('B'), Celda('P'), Celda()],
     [Celda(), Celda('B'), Celda(), Celda(), Celda()],
 ]
 
 def busqueda_profundidad(laberinto, inicio):
+    stack = deque([inicio])
     filas, columnas = len(laberinto), len(laberinto[0])
     limite = filas * columnas - 1
-    # limite = 3
-
-    stack = deque([inicio])
-    
-    print(f"Iniciando búsqueda en: {stack}")
     
     while stack:
         nodo = stack.popleft()
@@ -69,8 +65,8 @@ def busqueda_profundidad(laberinto, inicio):
                 if x_valido and y_valido:
                     nueva_celda = laberinto[x][y]
                     if nueva_celda.tipo != 'B':
+                        
                         # Agregar a la pila para explorar en la siguiente iteración
-                        # print(f"Intentando movimiento: {movimiento[2]}")
                         stack.appendleft(((x, y), iteracion + 1))
            
                         
