@@ -1,27 +1,14 @@
 from collections import deque
 from time import sleep
 
-    
-class Celda:
-    # Tipos de celda:
-    # 'C' - Camino Libre
-    # 'B' - Bloque (Obstaculo)
-    # 'G' - Galleta
-    # 'P' - Peggy
-    # 'E' - Elmo 
-    
-    def __init__(self, tipo = 'C', costo = 1):
-        self.costo = costo
-        self.tipo = tipo
-        
-    def __str__(self):
-        return self.tipo
+from classes.celda import Celda
+from classes.nodo import Nodo
 
 movimientos = [
-    (0, -1, "IZQUIERDA"), # IZQUIERDA  
-    (0, 1, "DERECHA"), # DERECHA
     (-1, 0, "ARRIBA"), # ARRIBA
     (1, 0, "ABAJO"), # ABAJO
+    (0, 1, "DERECHA"), # DERECHA
+    (0, -1, "IZQUIERDA"), # IZQUIERDA  
 ]
         
 laberinto = [
@@ -31,7 +18,7 @@ laberinto = [
     [Celda(), Celda('B'), Celda(), Celda(), Celda()],
 ]
 
-def busqueda_profundidad(laberinto, inicio):
+def busqueda_profundidad(laberinto: list, inicio: Nodo):
     stack = deque([inicio])
     filas, columnas = len(laberinto), len(laberinto[0])
     limite = filas * columnas - 1
@@ -39,8 +26,8 @@ def busqueda_profundidad(laberinto, inicio):
     while stack:
         nodo = stack.popleft()
         
-        coordenadas_celda = nodo[0]
-        iteracion = nodo[1]
+        coordenadas_celda = nodo.celda
+        iteracion = nodo.nivel
         
         celda = laberinto[coordenadas_celda[0]][coordenadas_celda[1]]
         
@@ -67,13 +54,10 @@ def busqueda_profundidad(laberinto, inicio):
                     if nueva_celda.tipo != 'B':
                         
                         # Agregar a la pila para explorar en la siguiente iteración
-                        stack.appendleft(((x, y), iteracion + 1))
-           
-                        
-            print(f"Push de hijos: {stack}")
+                        stack.appendleft(Nodo((x, y), iteracion + 1))
                 
     print("No encontré a Elmo :(")                
     return False                
 
 
-busqueda_profundidad(laberinto, ((0, 4), 0))
+busqueda_profundidad(laberinto, Nodo((0, 4), 0))
