@@ -1,10 +1,13 @@
+from collections import deque
 import pygame
 import random
-
+from time import sleep
 pygame.init()
 
+RUTA_IMAGENES = 'images/'
 ANCHO = 500
 ALTO = 400
+
 VENTANA = pygame.display.set_mode((ANCHO, ALTO))
 pygame.display.set_caption('Pacman versión Univalle')
 
@@ -12,35 +15,24 @@ NEGRO = (0, 0, 0)
 BLANCO = (255, 255, 255)
 
 class Laberinto:
-    def __init__(self):
-        self.filas = 6
-        self.columnas = 6
+    def __init__(self, mapa):
+        self.filas = len(mapa)
+        self.columnas = len(mapa[0])
         self.celda_ancho = ANCHO // self.columnas
         self.celda_alto = ALTO // self.filas
-        self.generar_mapa()
+        self.mapa = mapa
         self.cargar_imagenes()
 
-    def generar_mapa(self):
-        self.mapa = [[0 for _ in range(self.columnas)] for _ in range(self.filas)]
-        num_obstaculos = random.randint(5, 10) 
-
-        for _ in range(num_obstaculos):
-            fila = random.randint(0, self.filas - 1)
-            columna = random.randint(0, self.columnas - 1)
-            self.mapa[fila][columna] = 1  
-
-        self.mapa[3][2] = 2  # Galleta
-        self.mapa[4][0] = 3  # Elmo
-        self.mapa[5][3] = 4  # Piggy
-        self.mapa[4][5] = 5  # Rana Rene
+    def generar_mapa(self, mapa):
+        self.mapa = mapa
 
     def cargar_imagenes(self):
-        imagen_rene = pygame.image.load('imagen1.png')
-        imagen_elmo = pygame.image.load('imagen2.png')
-        imagen_piggy = pygame.image.load('imagen3.png')
-        imagen_galleta = pygame.image.load('imagen4.png')
-        imagen_obstaculo = pygame.image.load('obstaculo1.png')
-        imagen_camino = pygame.image.load('camino.png')
+        imagen_rene = pygame.image.load(RUTA_IMAGENES + 'imagen1.png')
+        imagen_elmo = pygame.image.load(RUTA_IMAGENES + 'imagen2.png')
+        imagen_piggy = pygame.image.load(RUTA_IMAGENES + 'imagen3.png')
+        imagen_galleta = pygame.image.load(RUTA_IMAGENES + 'imagen4.png')
+        imagen_obstaculo = pygame.image.load(RUTA_IMAGENES + 'obstaculo1.png')
+        imagen_camino = pygame.image.load(RUTA_IMAGENES + 'camino.png')
 
         tamaño_imagen = (self.celda_ancho, self.celda_alto)
         self.rene = pygame.transform.scale(imagen_rene, tamaño_imagen)
@@ -70,23 +62,32 @@ class Laberinto:
                     ventana.blit(self.camino, (x, y))  # Espacio vacío
 
 def juego():
-    laberinto = Laberinto()
-    reloj = pygame.time.Clock()
+    laberinto = Laberinto([
+        [0, 0, 0, 0, 0],
+        [0, 2, 1, 0, 0],
+        [0, 1, 1, 0, 0],
+        [0, 1, 0, 0, 0],
+    ])
+   
     
-    jugando = True
-    while jugando:
+    while True:
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
-                jugando = False
-        
-        VENTANA.fill(NEGRO)
-        
-        laberinto.dibujar(VENTANA)
-        
-        pygame.display.flip()
-        
-        reloj.tick(60)
-
+                pygame.quit()
+                quit()
+                
+        if movimientos:
+            mapa = movimientos.popleft()
+            laberinto.generar_mapa(mapa)
+            
+            laberinto.dibujar(VENTANA)
+            VENTANA.fill(NEGRO)
+            
+            laberinto.dibujar(VENTANA)
+            
+            pygame.display.flip()
+            
+            sleep(1)
     pygame.quit()
 
 juego()
