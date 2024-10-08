@@ -13,10 +13,14 @@ def deep_search(position, grid, movimientos):
         coordenadas = current_node.position
         iteracion = current_node.nivel
         
-        cell = grid[coordenadas[0]][coordenadas[1]]
+        try:
+            cell = grid[coordenadas[0]][coordenadas[1]]
+        except IndexError:
+            print("Error: Coordenadas fuera de rango")
         
-        # print("Extraer:", coordenadas, "iteracion:", iteracion, cell)
+        print("Extraer:", coordenadas, "iteracion:", iteracion, cell)
         if cell == "E":
+            print("¡Encontré a Elmo!, construyendo ruta...")
             return construir_ruta(current_node)
         
         if iteracion < limit:
@@ -33,10 +37,9 @@ def deep_search(position, grid, movimientos):
                     if nueva_celda != 1:
                         # Agregar a la pila para explorar en la siguiente iteración
                         new_node = Node((x,y), current_node, nivel=iteracion + 1)
-                        # print("Agregar:", new_node.position, "iteracion:", new_node.nivel, nueva_celda)
-                        
                         stack.appendleft(new_node)
-        # sleep(1)
+                        
+            print("Agregar hijos:", stack)
         
     return None
 
