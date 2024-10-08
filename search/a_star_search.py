@@ -6,7 +6,7 @@ import heapq
 def heuristic(a, b):
     return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
-def a_star_search(start, goal, grid):
+def a_star_search(start, goal, grid, movimientos):
     open_list = []
     closed_list = set()
 
@@ -25,8 +25,7 @@ def a_star_search(start, goal, grid):
             return path[::-1]  # Devuelve el camino en orden correcto
 
         # Explorar vecinos
-        # Movimientos: arriba, abajo, izquierda, derecha
-        for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+        for dx, dy in movimientos:
             neighbor_pos = (
                 current_node.position[0] + dx, current_node.position[1] + dy)
 

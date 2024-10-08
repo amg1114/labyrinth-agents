@@ -75,10 +75,11 @@ def juego():
     pygame.display.flip()
     
     laberinto = Laberinto([
-        [0, 0, 0, 0, "R"],
-        [0, "G", 1, 0, 0],
-        ["E", 1, 1, "P", 0],
-        [0, 1, 0, 0, 0],
+        #0, 1, 2, 3, 4
+        [0, 0, 0, 0, "R"],      # 0
+        [0, "G", 1, 0, 0,],     # 1
+        ["E", 1, 1, "P", 0,],   # 2
+        [0, 1, 0, 0, 0],        # 3
     ])
    
     rene = Rene((0,4))
@@ -93,23 +94,22 @@ def juego():
                 pygame.quit()
                 quit()
     
-        if rene_path and (last_player == piggy or last_player == None):
-            print("Se mueve René")
+        if rene_path:
             mapa = mover_agente(laberinto.mapa, rene_path.popleft(), "R")
             laberinto.generar_mapa(mapa)
-            last_player = rene
-        elif last_player == rene or not rene_path:
-            print("Se mueve Piggy")
-            movimiento = piggy.move(rene.position, laberinto.mapa)
-            mapa = mover_agente(laberinto.mapa, movimiento, "P")
-            laberinto.generar_mapa(mapa)
-            last_player = piggy    
+            # last_player = rene
+        # elif last_player == rene or not rene_path:
+            
+        #     movimiento = piggy.move(rene.position, laberinto.mapa)
+        #     mapa = mover_agente(laberinto.mapa, movimiento, "P")
+        #     laberinto.generar_mapa(mapa)
+        #     last_player = piggy    
          
         VENTANA.fill(NEGRO)
         laberinto.dibujar(VENTANA)
         
         pygame.display.flip()
-        sleep(.5)
+        sleep(1)
         
         
         

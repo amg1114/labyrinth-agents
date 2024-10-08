@@ -8,5 +8,12 @@ class Node:
         self.f = g + h  # Costo total
         self.nivel = nivel
 
+    def __str__(self):
+        return f"{self.position}"
+    
     def __lt__(self, other):
         return self.f < other.f
+    
+    def __repr__(self):
+        return self.__str__()
+    

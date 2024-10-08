@@ -14,8 +14,8 @@ class Agente(ABC):
         self.movimientos = [
             (-1, 0),  # ARRIBA
             (0, 1), # DERECHA
-            (0, -1), # IZQUIERDA
             (1, 0),  # ABAJO
+            (0, -1), # IZQUIERDA
         ]
    
 
@@ -34,10 +34,10 @@ class Piggy(Agente):
 
         if self.use_a_star:
             # print(f"Moviendo a Piggy usando A*")
-            path = a_star_search(self.position, target_position, grid)
+            path = a_star_search(self.position, target_position, grid, self.movimientos)
         else:
             # print(f"Moviendo a Piggy usando búsqueda por amplitud hacia")
-            path = bfs(self.position, target_position, grid)
+            path = bfs(self.position, target_position, grid, self.movimientos)
 
         if path:
             try:

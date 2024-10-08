@@ -3,7 +3,7 @@ from collections import deque
 # Implementación de BFS
 
 
-def bfs(start, goal, grid):
+def bfs(start, goal, grid, movimientos):
     queue = deque([start])
     visited = set()
     parent_map = {start: None}
@@ -20,8 +20,7 @@ def bfs(start, goal, grid):
         visited.add(current)
 
         # Explorar vecinos
-        # Movimientos: arriba, abajo, izquierda, derecha
-        for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+        for dx, dy in movimientos:
             neighbor_pos = (current[0] + dx, current[1] + dy)
 
             if (0 <= neighbor_pos[0] < len(grid) and
