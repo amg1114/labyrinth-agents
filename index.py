@@ -2,7 +2,9 @@ from collections import deque
 import pygame
 import random
 from time import sleep
-pygame.init()
+
+from classes.Agente import Piggy, Rene
+
 
 RUTA_IMAGENES = 'images/'
 ANCHO = 500
@@ -25,7 +27,15 @@ class Laberinto:
 
     def generar_mapa(self, mapa):
         self.mapa = mapa
-
+        
+    def mover_agente(self, posicion, agente):
+        for i in self.mapa:
+            for j in self.mapa[i]:
+                if self.mapa[i][j] == agente:
+                    self.mapa[i][j] = 0
+        self.mapa[posicion[0]][posicion[1]] = 5
+        
+        
     def cargar_imagenes(self):
         imagen_rene = pygame.image.load(RUTA_IMAGENES + 'imagen1.png')
         imagen_elmo = pygame.image.load(RUTA_IMAGENES + 'imagen2.png')
@@ -48,13 +58,13 @@ class Laberinto:
                 x = columna * self.celda_ancho
                 y = fila * self.celda_alto
                 
-                if self.mapa[fila][columna] == 5:
+                if self.mapa[fila][columna] == "R":
                     ventana.blit(self.rene, (x, y))  # Rana René
-                elif self.mapa[fila][columna] == 3:
+                elif self.mapa[fila][columna] == "E":
                     ventana.blit(self.elmo, (x, y))  # Elmo
-                elif self.mapa[fila][columna] == 4:
+                elif self.mapa[fila][columna] == "P":
                     ventana.blit(self.piggy, (x, y))  # Piggy
-                elif self.mapa[fila][columna] == 2:
+                elif self.mapa[fila][columna] == "G":
                     ventana.blit(self.galleta, (x, y))  # Galleta
                 elif self.mapa[fila][columna] == 1:
                     ventana.blit(self.obstaculo, (x, y))  # Obstáculo
@@ -62,32 +72,58 @@ class Laberinto:
                     ventana.blit(self.camino, (x, y))  # Espacio vacío
 
 def juego():
+    pygame.display.flip()
+    
     laberinto = Laberinto([
-        [0, 0, 0, 0, 0],
-        [0, 2, 1, 0, 0],
-        [0, 1, 1, 0, 0],
+        [0, 0, 0, 0, "R"],
+        [0, "G", 1, 0, 0],
+        ["E", 1, 1, "P", 0],
         [0, 1, 0, 0, 0],
     ])
    
+    rene = Rene((0,4))
+    piggy = Piggy((2,3))
+    last_player = None
     
+    rene_path = deque(rene.get_path(laberinto.mapa))
+    rene_path.popleft()
     while True:
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-                
-        if movimientos:
-            mapa = movimientos.popleft()
+    
+        if rene_path and (last_player == piggy or last_player == None):
+            print("Se mueve René")
+            mapa = mover_agente(laberinto.mapa, rene_path.popleft(), "R")
             laberinto.generar_mapa(mapa)
-            
-            laberinto.dibujar(VENTANA)
-            VENTANA.fill(NEGRO)
-            
-            laberinto.dibujar(VENTANA)
-            
-            pygame.display.flip()
-            
-            sleep(1)
+            last_player = rene
+        elif last_player == rene or not rene_path:
+            print("Se mueve Piggy")
+            movimiento = piggy.move(rene.position, laberinto.mapa)
+            mapa = mover_agente(laberinto.mapa, movimiento, "P")
+            laberinto.generar_mapa(mapa)
+            last_player = piggy    
+         
+        VENTANA.fill(NEGRO)
+        laberinto.dibujar(VENTANA)
+        
+        pygame.display.flip()
+        sleep(.5)
+        
+        
+        
+    
     pygame.quit()
 
+
+def mover_agente(mapa, posicion, agente):
+    for i in range(len(mapa)):
+        for j in range(len(mapa[i])):
+            if mapa[i][j] == agente:
+                mapa[i][j] = 0
+                
+    mapa[posicion[0]][posicion[1]] = agente
+    
+    return mapa
 juego()
