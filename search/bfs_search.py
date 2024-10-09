@@ -1,36 +1,46 @@
 from collections import deque
+from classes.Node import Node
 
-# Implementación de BFS
+# Implementación de BFS (ahora amplitud)
 
 
-def bfs(start, goal, grid, movimientos):
-    queue = deque([start])
+def bfs(start, grid, movimientos):
+    queue = deque([Node(start)])
     visited = set()
     parent_map = {start: None}
 
     while queue:
         current = queue.popleft()
-        if current == goal:
+        coordenadas = current.position
+        # Verifica si estamos en la meta (usando "goal" o si es Rene)
+        if grid[coordenadas[0]][coordenadas[1]] == "R":
             path = []
-            while current is not None:
-                path.append(current)
-                current = parent_map[current]
+            while current:
+                path.append(current.position)
+                current = current.parent
             return path[::-1]  # Devuelve el camino en orden correcto
 
-        visited.add(current)
+        visited.add(current.position)  # Añadir coordenadas, no el objeto
 
         # Explorar vecinos
         for dx, dy in movimientos:
-            neighbor_pos = (current[0] + dx, current[1] + dy)
+            x = coordenadas[0] + dx
+            y = coordenadas[1] + dy
 
-            if (0 <= neighbor_pos[0] < len(grid) and
-                0 <= neighbor_pos[1] < len(grid[0]) and
-                # Verifica que no sea un obstáculo
-                grid[neighbor_pos[0]][neighbor_pos[1]] != 1 and
-                    neighbor_pos not in visited):
+            x_valido = 0 <= x < len(grid)
+            y_valido = 0 <= y < len(grid[0])
 
-                queue.append(neighbor_pos)
-                visited.add(neighbor_pos)
-                parent_map[neighbor_pos] = current  # Registro del predecesor
+            if x_valido and y_valido:
+                nueva_celda = grid[x][y]
+                vecino_pos = (x, y)
+
+                # Verifica que no sea un obstáculo y no haya sido visitado
+                if nueva_celda != 1 and vecino_pos not in visited:
+                    # Agregar a la cola para explorar en la siguiente iteración
+                    new_node = Node(vecino_pos, current)
+                    queue.append(new_node)
+                    visited.add(vecino_pos)
+                    # Registro del predecesor
+                    parent_map[vecino_pos] = current.position
 
     return []  # No hay camino encontrado
