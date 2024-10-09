@@ -78,15 +78,15 @@ def juego():
 
     laberinto = Laberinto([
         # 0, 1, 2, 3, 4
-        [0, 0, 0, 0, "R"],      # 0
-        [0, "G", 1, 0, 0,],     # 1
-        ["E", 1, 1, 0, 0,],   # 2
-        [0, 1, 0, "P", 0],        # 3
+        [0, 0, 0, 0, "R"],  # 0
+        [0, "G", 1, 0, 0,], # 1
+        ["E", 1, 1, 0, 0,], # 2
+        [0, 1, 0, "P", 0],  # 3
     ])
 
     rene = Rene((0, 4))
     piggy = Piggy((3, 3))
-    last_player = None
+    turno = rene
 
     rene_path = deque(rene.get_path(laberinto.mapa))
     rene_path.popleft()
@@ -96,16 +96,20 @@ def juego():
                 pygame.quit()
                 quit()
 
-        if rene_path:
-            mapa = mover_agente(laberinto.mapa, rene_path.popleft(), "R")
-            laberinto.generar_mapa(mapa)
-            last_player = rene
-
-        if not piggy.find_rene:  # Solo mover a Piggy si no ha encontrado a René
-            movimiento = piggy.move(rene.position, laberinto.mapa)
-            mapa = mover_agente(laberinto.mapa, movimiento, "P")
-            laberinto.generar_mapa(mapa)
-            last_player = piggy
+        if turno == rene and rene_path:
+            rene_pos = rene_path.popleft()
+            laberinto.mapa = mover_agente(
+                laberinto.mapa, rene_pos, "R")
+            turno = piggy
+        elif turno == piggy:
+            if not piggy.find_rene:
+                movimiento = piggy.move(rene.position, laberinto.mapa)
+                mapa = mover_agente(laberinto.mapa, movimiento, "P")
+                laberinto.generar_mapa(mapa)
+            
+            turno = rene
+                
+            
 
         VENTANA.fill(NEGRO)
         laberinto.dibujar(VENTANA)
