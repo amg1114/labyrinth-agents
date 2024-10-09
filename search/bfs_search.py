@@ -1,26 +1,27 @@
 from collections import deque
 from classes.Node import Node
 
+
 # Implementación de BFS (ahora amplitud)
+def bfs(start, goal, grid, movimientos):
 
-
-def bfs(start, grid, movimientos):
     queue = deque([Node(start)])
     visited = set()
     parent_map = {start: None}
 
     while queue:
+
         current = queue.popleft()
         coordenadas = current.position
+        visited.add(current.position)  # Añadir coordenadas, no el objeto
+
         # Verifica si estamos en la meta (usando "goal" o si es Rene)
-        if grid[coordenadas[0]][coordenadas[1]] == "R":
+        if grid[coordenadas[0]][coordenadas[1]] == "R" or current.position == goal:
             path = []
             while current:
                 path.append(current.position)
                 current = current.parent
             return path[::-1]  # Devuelve el camino en orden correcto
-
-        visited.add(current.position)  # Añadir coordenadas, no el objeto
 
         # Explorar vecinos
         for dx, dy in movimientos:
@@ -31,15 +32,19 @@ def bfs(start, grid, movimientos):
             y_valido = 0 <= y < len(grid[0])
 
             if x_valido and y_valido:
+
                 nueva_celda = grid[x][y]
                 vecino_pos = (x, y)
 
                 # Verifica que no sea un obstáculo y no haya sido visitado
                 if nueva_celda != 1 and vecino_pos not in visited:
+
                     # Agregar a la cola para explorar en la siguiente iteración
                     new_node = Node(vecino_pos, current)
+
                     queue.append(new_node)
                     visited.add(vecino_pos)
+
                     # Registro del predecesor
                     parent_map[vecino_pos] = current.position
 

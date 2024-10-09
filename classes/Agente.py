@@ -27,14 +27,15 @@ class Piggy(Agente):
         super().__init__(position)
 
     def move(self, target_position, grid):
-        path = None  # Inicializa 'path' por defecto
 
+        # Si Piggy ya ha encontrado a René, detén el movimiento
         if self.find_rene:
-            return self.position
+            print("Piggy ya encontró a René, deteniendo movimiento.")
+            return self.position  # No realizar más movimientos
 
-        # Si Piggy llega a la posición de René, detén el movimiento
-        if target_position == self.position:
+        if self.position == target_position:
             self.find_rene = True
+            print("¡Piggy ha encontrado a René!")
             return self.position
 
         # Decide si cambiará la estrategia por A* con 40% de probabilidad
@@ -43,24 +44,34 @@ class Piggy(Agente):
         else:
             self.use_a_star = False
 
+        # Usar A* o BFS según la probabilidad
         if self.use_a_star:
-            # print(f"Moviendo a Piggy usando A*")
+            print(f"Moviendo a Piggy usando A*")
             path = a_star_search(
                 self.position, target_position, grid, self.movimientos)
         else:
-            # print(f"Moviendo a Piggy usando búsqueda por amplitud hacia")
-            path = bfs(self.position, grid, self.movimientos)
+            print(f"Moviendo a Piggy usando BFS")
+            path = bfs(self.position, target_position, grid, self.movimientos)
 
-        if path:
-            print(path)
-            try:
-                self.position = path[1]
-                return self.position
-            except IndexError:
-                return self.position
-        else:
+        # Si no se encuentra un camino, devuelve la posición actual
+        if not path:
             print("No hay camino encontrado")
-            return self.position  # No hay movimiento posible
+            return self.position
+
+        try:
+            self.position = path[1]  # Mover al siguiente nodo en el camino
+            print(f"Piggy se mueve a {self.position}")
+
+            # Si Piggy llega a la posición de René, detén el movimiento
+            if self.position == target_position:
+                self.find_rene = True
+                print("¡Piggy ha encontrado a René!")
+
+            return self.position
+
+        except IndexError:
+            print("Error en el movimiento de Piggy, manteniendo posición actual.")
+            return self.position
 
 
 class Rene(Agente):

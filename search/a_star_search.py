@@ -1,9 +1,8 @@
 from classes.Node import Node
 import heapq
 
+
 # Implementación de A*
-
-
 def heuristic(a, b):
     return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
@@ -28,7 +27,7 @@ def a_star_search(start, goal, grid, movimientos):
             print("Error: Coordenadas fuera de rango")
 
         # Verificar si ya hemos llegado a la meta
-        if cell == "R":
+        if cell == "R" or current_node.position == goal:
             path = []
             while current_node:
                 path.append(current_node.position)
@@ -37,15 +36,16 @@ def a_star_search(start, goal, grid, movimientos):
 
         # Explorar vecinos
         for dx, dy in movimientos:
+
             neighbor_pos = (
                 current_node.position[0] + dx, current_node.position[1] + dy)
+
             if neighbor_pos in closed_list:
                 continue
 
             if (0 <= neighbor_pos[0] < len(grid) and
                 0 <= neighbor_pos[1] < len(grid[0]) and
-                grid[neighbor_pos[0]][neighbor_pos[1]] != 1 and
-                    neighbor_pos not in closed_list):
+                    grid[neighbor_pos[0]][neighbor_pos[1]] != 1):
 
                 g = current_node.g + 1  # El costo actual para llegar a este nodo vecino
                 # Heurística (distancia aproximada al objetivo)
