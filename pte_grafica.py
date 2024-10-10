@@ -74,10 +74,10 @@ class Laberinto:
 
 def pantalla_bienvenida():
 
-    imagen_fondo = pygame.image.load('fondo_bienvenida.jpeg')  # Aquí cargas tu imagen de fondo
+    imagen_fondo = pygame.image.load('fondo_bienvenida.png')  # Aquí cargas tu imagen de fondo
     imagen_fondo = pygame.transform.scale(imagen_fondo, (ANCHO, ALTO))
 
-    boton_play = pygame.Rect(ANCHO // 2 - 50, ALTO // 2 - 25, 100, 50)  # Botón centrado
+    boton_play = pygame.Rect(ANCHO // 2 - 50, ALTO // 2 - 100, 100, 50)  # Botón centrado
 
     bienvenida = True
     while bienvenida:
