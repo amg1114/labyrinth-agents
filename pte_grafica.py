@@ -1,10 +1,10 @@
 import pygame
 import random
-
 pygame.init()
 
-ANCHO = 500
-ALTO = 400
+# Dimensiones de la ventana
+ANCHO = 800
+ALTO = 700
 VENTANA = pygame.display.set_mode((ANCHO, ALTO))
 pygame.display.set_caption('Pacman versión Univalle')
 
@@ -21,20 +21,22 @@ class Laberinto:
         self.cargar_imagenes()
 
     def generar_mapa(self):
+        # mapa con obstáculos aleatorios
         self.mapa = [[0 for _ in range(self.columnas)] for _ in range(self.filas)]
-        num_obstaculos = random.randint(5, 10) 
+        num_obstaculos = random.randint(5, 10)  
 
         for _ in range(num_obstaculos):
             fila = random.randint(0, self.filas - 1)
             columna = random.randint(0, self.columnas - 1)
-            self.mapa[fila][columna] = 1  
+            self.mapa[fila][columna] = 1  # Colocar un obstáculo
 
         self.mapa[3][2] = 2  # Galleta
         self.mapa[4][0] = 3  # Elmo
         self.mapa[5][3] = 4  # Piggy
-        self.mapa[4][5] = 5  # Rana Rene
+        self.mapa[4][5] = 5  # Rana René
 
     def cargar_imagenes(self):
+        
         imagen_rene = pygame.image.load('imagen1.png')
         imagen_elmo = pygame.image.load('imagen2.png')
         imagen_piggy = pygame.image.load('imagen3.png')
@@ -50,6 +52,7 @@ class Laberinto:
         self.obstaculo = pygame.transform.scale(imagen_obstaculo, tamaño_imagen)
         self.camino = pygame.transform.scale(imagen_camino, tamaño_imagen)
 
+    # dibujar el laberinto
     def dibujar(self, ventana):
         for fila in range(len(self.mapa)):
             for columna in range(len(self.mapa[0])): 
@@ -69,6 +72,48 @@ class Laberinto:
                 elif self.mapa[fila][columna] == 0:
                     ventana.blit(self.camino, (x, y))  # Espacio vacío
 
+def pantalla_bienvenida():
+
+    imagen_fondo = pygame.image.load('fondo_bienvenida.jpeg')  # Aquí cargas tu imagen de fondo
+    imagen_fondo = pygame.transform.scale(imagen_fondo, (ANCHO, ALTO))
+
+    boton_play = pygame.Rect(ANCHO // 2 - 50, ALTO // 2 - 25, 100, 50)  # Botón centrado
+
+    bienvenida = True
+    while bienvenida:
+        for evento in pygame.event.get():
+            if evento.type == pygame.QUIT:
+                bienvenida = False
+                pygame.quit()
+                return False  
+            if evento.type == pygame.MOUSEBUTTONDOWN:
+                if boton_play.collidepoint(evento.pos):
+                    bienvenida = False 
+                    return True 
+
+        # pantalla de bienvenida
+        VENTANA.blit(imagen_fondo, (0, 0))
+        
+        mouse_pos = pygame.mouse.get_pos()
+        if boton_play.collidepoint(mouse_pos):
+            color_boton = (200, 200, 200)  
+            sombra_offset = 5
+        else:
+            color_boton = BLANCO
+            sombra_offset = 0
+
+        sombra_rect = pygame.Rect(boton_play.x + sombra_offset, boton_play.y + sombra_offset, boton_play.width, boton_play.height)
+        pygame.draw.rect(VENTANA, (50, 50, 50), sombra_rect, border_radius=10)
+
+        pygame.draw.rect(VENTANA, color_boton, boton_play, border_radius=10)
+
+        fuente = pygame.font.Font(None, 40)
+        texto = fuente.render("Play", True, NEGRO)
+        VENTANA.blit(texto, (boton_play.x + 20, boton_play.y + 10))
+
+        pygame.display.flip()
+
+# Función principal del juego
 def juego():
     laberinto = Laberinto()
     reloj = pygame.time.Clock()
@@ -78,15 +123,17 @@ def juego():
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
                 jugando = False
-        
+
         VENTANA.fill(NEGRO)
-        
+
         laberinto.dibujar(VENTANA)
-        
+
         pygame.display.flip()
-        
+
         reloj.tick(60)
 
     pygame.quit()
 
-juego()
+# Ejecutar la pantalla de bienvenida
+if pantalla_bienvenida():
+    juego()
