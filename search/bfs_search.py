@@ -3,7 +3,7 @@ from classes.Node import Node
 
 
 # Implementación de BFS (ahora amplitud)
-def bfs(start, goal, grid, movimientos):
+def bfs(start, goal, grid, movimientos, self):
 
     queue = deque([Node(start)])
     visited = set()
@@ -21,7 +21,13 @@ def bfs(start, goal, grid, movimientos):
             while current:
                 path.append(current.position)
                 current = current.parent
-            return path[::-1]  # Devuelve el camino en orden correcto
+
+            camino = path[::-1]
+
+            next_step = camino[1]
+            if grid[next_step[0]][next_step[1]] == "G":
+                self.find_galleta = True
+            return camino  # Devuelve el camino en orden correcto
 
         # Explorar vecinos
         for dx, dy in movimientos:

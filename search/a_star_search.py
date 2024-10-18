@@ -7,7 +7,8 @@ def heuristic(a, b):
     return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
 
-def a_star_search(start, goal, grid, movimientos):
+def a_star_search(start, goal, grid, movimientos, self):
+
     open_list = []
     closed_list = set()
     # Diccionario para mantener el costo más bajo conocido hasta el momento
@@ -32,7 +33,24 @@ def a_star_search(start, goal, grid, movimientos):
             while current_node:
                 path.append(current_node.position)
                 current_node = current_node.parent
-            return path[::-1]  # Devuelve el camino en orden correcto
+
+            camino = path[::-1]
+
+            # El costo del primer paso (path[1]) debe ser del nodo correspondiente a la segunda posición en el camino
+            if len(camino) > 1:
+                next_step = camino[1]
+                if next_step == goal:  # Si el siguiente paso es la meta
+                    # Devolver el costo hasta el objetivo
+                    costo = g_score[goal]
+                else:
+                    # Devolver el costo del primer paso
+                    costo = g_score[next_step]
+
+            next_step = camino[1]
+            if grid[next_step[0]][next_step[1]] == "G":
+                self.find_galleta = True
+
+            return camino, costo
 
         # Explorar vecinos
         for dx, dy in movimientos:
@@ -47,16 +65,17 @@ def a_star_search(start, goal, grid, movimientos):
                 0 <= neighbor_pos[1] < len(grid[0]) and
                     grid[neighbor_pos[0]][neighbor_pos[1]] != 1):
 
-                g = current_node.g + 1  # El costo actual para llegar a este nodo vecino
-                # Heurística (distancia aproximada al objetivo)
+                if self.find_galleta:
+                    g = current_node.g + 0.5
+                else:
+                    g = current_node.g + 1
+
                 h = heuristic(neighbor_pos, goal)
                 neighbor_node = Node(neighbor_pos, current_node, g, h)
 
-                # Si este vecino ya tiene un camino mejor conocido, no lo volvemos a procesar
                 if neighbor_pos in g_score and g >= g_score[neighbor_pos]:
                     continue
 
-                # Actualiza el mejor camino conocido hacia este vecino
                 g_score[neighbor_pos] = g
                 heapq.heappush(open_list, neighbor_node)
 

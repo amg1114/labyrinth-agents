@@ -74,13 +74,14 @@ class Laberinto:
 
 
 def juego():
+    costo_acumulado = 0
     pygame.display.flip()
 
     laberinto = Laberinto([
         # 0, 1, 2, 3, 4
         [0, 0, 0, 0, "R"],  # 0
-        [0, "G", 1, 0, 0,],  # 1
-        ["E", 1, 1, 0, 0,],  # 2
+        [0, 0, 1, 0, 0,],  # 1
+        ["E", 1, 1, "G", 0,],  # 2
         [0, 1, 0, "P", 0],  # 3
     ])
 
@@ -88,6 +89,9 @@ def juego():
     piggy = Piggy((3, 3))
     turno = rene
     rene_pos = None
+    rene_pos_anterior = None
+    piggy_pos = None
+    piggy_pos_anterior = None
 
     rene_path = deque(rene.get_path(laberinto.mapa))
     rene_path.popleft()
@@ -99,17 +103,22 @@ def juego():
 
         if turno == piggy:
             if not piggy.find_rene:
+                piggy_pos_anterior = piggy_pos
                 print("Mueve piggy")
-                print(rene_pos)
-                movimiento = piggy.move(rene_pos, laberinto.mapa)
-                mapa = mover_agente(laberinto.mapa, movimiento, "P")
+                movimiento, costo = piggy.move(rene_pos, laberinto.mapa)
+                costo_acumulado += costo
+                print("Costo Acumulado de piggy", costo_acumulado)
+                piggy_pos = movimiento
+                mapa = mover_agente(laberinto.mapa, piggy_pos,
+                                    "P", piggy_pos_anterior, rene_pos, "R")
                 laberinto.generar_mapa(mapa)
             turno = rene
         elif turno == rene and rene_path:
+            rene_pos_anterior = rene_pos
             print("Mueve Rene")
             rene_pos = rene_path.popleft()
             laberinto.mapa = mover_agente(
-                laberinto.mapa, rene_pos, "R")
+                laberinto.mapa, rene_pos, "R", rene_pos_anterior, piggy_pos, "P")
             turno = piggy
 
         VENTANA.fill(NEGRO)
@@ -121,13 +130,19 @@ def juego():
     pygame.quit()
 
 
-def mover_agente(mapa, posicion, agente):
-    for i in range(len(mapa)):
-        for j in range(len(mapa[i])):
-            if mapa[i][j] == agente:
-                mapa[i][j] = 0
+def mover_agente(mapa, pos_nueva, agente, pos_anterior, counter_posicion, counter_agente):
+    if pos_anterior is None:
+        for i in range(len(mapa)):
+            for j in range(len(mapa[i])):
+                if mapa[i][j] == agente:
+                    mapa[i][j] = 0
+    else:
+        if pos_anterior != counter_posicion:
+            mapa[pos_anterior[0]][pos_anterior[1]] = 0
+        else:
+            mapa[pos_anterior[0]][pos_anterior[1]] = counter_agente
 
-    mapa[posicion[0]][posicion[1]] = agente
+    mapa[pos_nueva[0]][pos_nueva[1]] = agente
 
     return mapa
 
