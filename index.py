@@ -16,8 +16,6 @@ BLANCO = (255, 255, 255)
 VENTANA = pygame.display.set_mode((ANCHO, ALTO))
 pygame.display.set_caption('Pacman versión Univalle')
 
-
-
 class Laberinto:
     def __init__(self, mapa):
         self.filas = len(mapa)
@@ -27,7 +25,7 @@ class Laberinto:
         self.mapa = mapa
         self.cargar_imagenes()
 
-    def generar_mapa(self, mapa):
+    def set_mapa(self, mapa):
         self.mapa = mapa
 
     def mover_agente(self, posicion, agente):
@@ -149,7 +147,7 @@ def juego():
                 piggy_pos = movimiento
                 mapa = mover_agente(laberinto.mapa, piggy_pos,
                                     "P", piggy_pos_anterior, rene_pos, "R")
-                laberinto.generar_mapa(mapa)
+                laberinto.set_mapa(mapa)
             turno = rene
         elif turno == rene and rene_path:
             rene_pos_anterior = rene_pos
