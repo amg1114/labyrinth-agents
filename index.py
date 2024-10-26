@@ -5,7 +5,7 @@ from time import sleep
 
 from classes.Agente import Piggy, Rene
 
-
+pygame.init()
 RUTA_IMAGENES = 'images/'
 ANCHO = 500
 ALTO = 400
@@ -72,6 +72,43 @@ class Laberinto:
                 elif self.mapa[fila][columna] == 0:
                     ventana.blit(self.camino, (x, y))  # Espacio vacío
 
+
+def welcome():
+    fondo = pygame.image.load(RUTA_IMAGENES + 'fondo_bienvenida.png')
+    fondo = pygame.transform.scale(fondo, (ANCHO, ALTO))
+    
+    play_button = pygame.rect.Rect(ANCHO // 2 - 50, ALTO // 2 - 25, 100, 50)
+    
+    while True:
+        for evento in pygame.event.get():
+            if evento.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+                return False
+            if evento.type == pygame.MOUSEBUTTONDOWN:
+                if play_button.collidepoint(evento.pos):
+                    return True
+
+        VENTANA.blit(fondo, (0, 0))
+        mouse = pygame.mouse.get_pos()
+        
+        button_color = BLANCO
+        shadow_offset = 0
+        
+        if play_button.collidepoint(mouse):
+            button_color = (200, 200, 200)
+            shadow_offset = 5
+            
+        shadow_rect = pygame.rect.Rect(play_button.left + shadow_offset, play_button.top + shadow_offset, play_button.width, play_button.height)
+        pygame.draw.rect(VENTANA, (50, 50, 50), shadow_rect, border_radius=10)
+        pygame.draw.rect(VENTANA, button_color, play_button, border_radius=10)
+        
+        font = pygame.font.Font(None, 40)
+        text = font.render("Jugar", True, NEGRO)
+        VENTANA.blit(text, (play_button.x + 20, play_button.y + 10))
+        
+        pygame.display.flip()
+    
 
 def juego():
     costo_acumulado = 0
@@ -147,4 +184,5 @@ def mover_agente(mapa, pos_nueva, agente, pos_anterior, counter_posicion, counte
     return mapa
 
 
-juego()
+if welcome():
+    juego()
