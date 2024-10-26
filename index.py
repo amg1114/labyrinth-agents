@@ -1,20 +1,21 @@
-from collections import deque
 import pygame
-import random
+
+from collections import deque
 from time import sleep
 
 from classes.Agente import Piggy, Rene
 
 pygame.init()
+
 RUTA_IMAGENES = 'images/'
 ANCHO = 500
 ALTO = 400
+NEGRO = (0, 0, 0)
+BLANCO = (255, 255, 255)
 
 VENTANA = pygame.display.set_mode((ANCHO, ALTO))
 pygame.display.set_caption('Pacman versión Univalle')
 
-NEGRO = (0, 0, 0)
-BLANCO = (255, 255, 255)
 
 
 class Laberinto:
