@@ -28,12 +28,20 @@ class Laberinto:
     def set_mapa(self, mapa):
         self.mapa = mapa
 
-    def mover_agente(self, posicion, agente):
-        for i in self.mapa:
-            for j in self.mapa[i]:
-                if self.mapa[i][j] == agente:
-                    self.mapa[i][j] = 0
-        self.mapa[posicion[0]][posicion[1]] = 5
+    def mover_agente(self, pos_anterior, pos_nueva, agente, counter_agente, counter_posicion):
+        if pos_anterior is None:
+            for i in range(len(self.mapa)):
+                for j in range(len(self.mapa[i])):
+                    if self.mapa[i][j] == agente:
+                        self.mapa[i][j] = 0
+        else:
+            if pos_anterior != counter_posicion:
+                self.mapa[pos_anterior[0]][pos_anterior[1]] = 0
+            else:
+                self.mapa[pos_anterior[0]][pos_anterior[1]] = counter_agente
+
+        self.mapa[pos_nueva[0]][pos_nueva[1]] = agente
+
 
     def cargar_imagenes(self):
         imagen_rene = pygame.image.load(RUTA_IMAGENES + 'imagen1.png')
@@ -131,6 +139,7 @@ def juego():
 
     rene_path = deque(rene.get_path(laberinto.mapa))
     rene_path.popleft()
+    
     while True:
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
@@ -140,47 +149,35 @@ def juego():
         if turno == piggy:
             if not piggy.find_rene:
                 piggy_pos_anterior = piggy_pos
-                print("Mueve piggy")
                 movimiento, costo = piggy.move(rene_pos, laberinto.mapa)
                 costo_acumulado += costo
-                print("Costo Acumulado de piggy", costo_acumulado)
                 piggy_pos = movimiento
-                mapa = mover_agente(laberinto.mapa, piggy_pos,
-                                    "P", piggy_pos_anterior, rene_pos, "R")
-                laberinto.set_mapa(mapa)
+                
+                laberinto.mover_agente(
+                    piggy_pos_anterior, piggy_pos, "P", piggy_pos, "R")
+                
+                print("Mueve piggy")
+                print("Costo Acumulado de piggy", costo_acumulado)
+                sleep(1)
+                
             turno = rene
         elif turno == rene and rene_path:
             rene_pos_anterior = rene_pos
-            print("Mueve Rene")
             rene_pos = rene_path.popleft()
-            laberinto.mapa = mover_agente(
-                laberinto.mapa, rene_pos, "R", rene_pos_anterior, piggy_pos, "P")
+            
+            laberinto.mover_agente(
+                rene_pos_anterior, rene_pos, "R", rene_pos, "P")
+            
             turno = piggy
+            print("Mueve Rene")
+            sleep(1)
 
         VENTANA.fill(NEGRO)
         laberinto.dibujar(VENTANA)
 
         pygame.display.flip()
-        sleep(1)
 
     pygame.quit()
-
-
-def mover_agente(mapa, pos_nueva, agente, pos_anterior, counter_posicion, counter_agente):
-    if pos_anterior is None:
-        for i in range(len(mapa)):
-            for j in range(len(mapa[i])):
-                if mapa[i][j] == agente:
-                    mapa[i][j] = 0
-    else:
-        if pos_anterior != counter_posicion:
-            mapa[pos_anterior[0]][pos_anterior[1]] = 0
-        else:
-            mapa[pos_anterior[0]][pos_anterior[1]] = counter_agente
-
-    mapa[pos_nueva[0]][pos_nueva[1]] = agente
-
-    return mapa
 
 
 if welcome():
