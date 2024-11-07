@@ -57,24 +57,32 @@ class Laberinto:
                 ocupados)
             self.mapa[obstaculo_fila][obstaculo_columna] = 1  # Obstaculo
 
-        return self.mapa, rene_fila, rene_columna, piggy_fila, piggy_columna
+        elmo_pos = (elmo_fila, elmo_columna)
+
+        return self.mapa, rene_fila, rene_columna, piggy_fila, piggy_columna, elmo_pos
 
     def set_mapa(self, mapa):
         self.mapa = generar_mapa()
 
-    def mover_agente(self, pos_anterior, pos_nueva, agente, counter_posicion, counter_agente):
-        if pos_anterior is None:
+    def mover_agente(self, pos_nueva, agente, elmo_pos, pos_anterior):
+        if not pos_anterior:
             for i in range(len(self.mapa)):
                 for j in range(len(self.mapa[i])):
                     if self.mapa[i][j] == agente:
                         self.mapa[i][j] = 0
         else:
-            if pos_anterior != counter_posicion:
-                self.mapa[pos_anterior[0]][pos_anterior[1]] = 0
+            if pos_anterior == elmo_pos:
+                for i in range(len(self.mapa)):
+                    for j in range(len(self.mapa[i])):
+                        if self.mapa[i][j] == agente:
+                            self.mapa[i][j] = "E"
             else:
-                self.mapa[pos_anterior[0]][pos_anterior[1]] = counter_agente
-
-        self.mapa[pos_nueva[0]][pos_nueva[1]] = agente
+                for i in range(len(self.mapa)):
+                    for j in range(len(self.mapa[i])):
+                        if self.mapa[i][j] == agente:
+                            self.mapa[i][j] = 0
+        if pos_nueva:
+            self.mapa[pos_nueva[0]][pos_nueva[1]] = agente
 
     def cargar_imagenes(self):
         imagen_rene = pygame.image.load(RUTA_IMAGENES + 'imagen1.png')
@@ -156,7 +164,7 @@ def juego():
     pygame.display.flip()
 
     laberinto = Laberinto([[0 for _ in range(5)] for _ in range(5)])
-    mapa_aleatorio, rene_fila, rene_columna, piggy_fila, piggy_columna = laberinto.generar_mapa()
+    mapa_aleatorio, rene_fila, rene_columna, piggy_fila, piggy_columna, elmo_pos = laberinto.generar_mapa()
 
     rene = Rene((rene_fila, rene_columna))
     piggy = Piggy((piggy_fila, piggy_columna))
@@ -188,7 +196,7 @@ def juego():
                 piggy_pos = movimiento
 
                 laberinto.mover_agente(
-                    piggy_pos_anterior, piggy_pos, "P", piggy_pos, "R")
+                    piggy_pos, "P", elmo_pos, piggy_pos_anterior)
 
                 print("Mueve piggy")
                 print("Costo Acumulado de piggy", costo_acumulado)
@@ -201,8 +209,7 @@ def juego():
             rene_pos_anterior = rene_pos
             rene_pos = rene_path.popleft()
 
-            laberinto.mover_agente(
-                rene_pos_anterior, rene_pos, "R", rene_pos, "P")
+            laberinto.mover_agente(rene_pos, "R", elmo_pos, rene_pos_anterior)
 
             turno = piggy
             print("Mueve Rene")
