@@ -11,7 +11,10 @@ def a_star_search(start, goal, grid, movimientos, self):
 
     open_list = []
     closed_list = set()
-    # Diccionario para mantener el costo más bajo conocido hasta el momento
+
+    costo = 0
+    camino = []
+
     g_score = {start: 0}
 
     start_node = Node(start, None, 0, heuristic(start, goal))
@@ -27,7 +30,6 @@ def a_star_search(start, goal, grid, movimientos, self):
         except IndexError:
             print("Error: Coordenadas fuera de rango")
 
-        # Verificar si ya hemos llegado a la meta
         if cell == "R" or current_node.position == goal:
             path = []
             while current_node:
@@ -36,19 +38,17 @@ def a_star_search(start, goal, grid, movimientos, self):
 
             camino = path[::-1]
 
-            # El costo del primer paso (path[1]) debe ser del nodo correspondiente a la segunda posición en el camino
             if len(camino) > 1:
                 next_step = camino[1]
-                if next_step == goal:  # Si el siguiente paso es la meta
-                    # Devolver el costo hasta el objetivo
+                if next_step == goal:
                     costo = g_score[goal]
                 else:
-                    # Devolver el costo del primer paso
                     costo = g_score[next_step]
 
             next_step = camino[1]
             if grid[next_step[0]][next_step[1]] == "G":
                 self.find_galleta = True
+                print("Piggy encontro la galleta!!!!")
 
             return camino, costo
 
@@ -79,4 +79,4 @@ def a_star_search(start, goal, grid, movimientos, self):
                 g_score[neighbor_pos] = g
                 heapq.heappush(open_list, neighbor_node)
 
-    return []  # No se encontró camino
+    return camino, costo  # No se encontró camino

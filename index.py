@@ -13,6 +13,7 @@ ANCHO = 500
 ALTO = 400
 NEGRO = (0, 0, 0)
 BLANCO = (255, 255, 255)
+CANT_OBSTACULOS = 5
 
 VENTANA = pygame.display.set_mode((ANCHO, ALTO))
 pygame.display.set_caption('Pacman versión Univalle')
@@ -38,7 +39,7 @@ class Laberinto:
     def generar_mapa(self):
 
         ocupados = []
-        obstaculos = 5
+        obstaculos = CANT_OBSTACULOS
 
         rene_fila, rene_columna = self.posicion_aleatoria(ocupados)
         self.mapa[rene_fila][rene_columna] = "R"  # Rene
@@ -178,15 +179,22 @@ def juego():
     rene_path = deque(rene.get_path(laberinto.mapa))
     rene_path.popleft()
 
+    VENTANA.fill(NEGRO)
+    laberinto.dibujar(VENTANA)
+    pygame.display.flip()
+
     while True:
+
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
                 pygame.quit()
                 quit()
 
         if piggy.find_rene or not rene_path:
+            print("Costo Acumulado de piggy", costo_acumulado)
             pygame.quit()
             quit()
+
         elif turno == piggy:
 
             if not piggy.find_rene:
@@ -198,8 +206,6 @@ def juego():
                 laberinto.mover_agente(
                     piggy_pos, "P", elmo_pos, piggy_pos_anterior)
 
-                print("Mueve piggy")
-                print("Costo Acumulado de piggy", costo_acumulado)
                 sleep(1)
 
             turno = rene
@@ -215,9 +221,16 @@ def juego():
             print("Mueve Rene")
             sleep(1)
 
+            if piggy_pos == rene_pos:
+                VENTANA.fill(NEGRO)
+                laberinto.dibujar(VENTANA)
+                pygame.display.flip()
+                print("Ups... Rene se encontro con piggy")
+                pygame.quit()
+                quit()
+
         VENTANA.fill(NEGRO)
         laberinto.dibujar(VENTANA)
-
         pygame.display.flip()
 
     pygame.quit()

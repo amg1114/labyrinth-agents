@@ -27,6 +27,7 @@ def bfs(start, goal, grid, movimientos, self):
             next_step = camino[1]
             if grid[next_step[0]][next_step[1]] == "G":
                 self.find_galleta = True
+                print("Piggy encontro la galleta!!!!")
             return camino  # Devuelve el camino en orden correcto
 
         # Explorar vecinos
