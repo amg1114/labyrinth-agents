@@ -1,147 +1,57 @@
 import pygame
-import random
 
 from collections import deque
 from time import sleep
 
 from classes.Agente import Piggy, Rene
+from classes.Laberinto import Laberinto
+
+from constants import Maze
 
 pygame.init()
 
-RUTA_IMAGENES = 'images/'
 ANCHO = 500
 ALTO = 400
 NEGRO = (0, 0, 0)
 BLANCO = (255, 255, 255)
-CANT_OBSTACULOS = 5
-
 VENTANA = pygame.display.set_mode((ANCHO, ALTO))
+
+
 pygame.display.set_caption('Pacman versión Univalle')
 
-
-class Laberinto:
-    def __init__(self, mapa):
-        self.filas = len(mapa)
-        self.columnas = len(mapa[0])
-        self.celda_ancho = ANCHO // self.columnas
-        self.celda_alto = ALTO // self.filas
-        self.mapa = mapa
-        self.cargar_imagenes()
-
-    def posicion_aleatoria(self, ocupados):
-        while True:
-            fila = random.randint(0, self.filas - 1)
-            columna = random.randint(0, self.columnas - 1)
-            if (fila, columna) not in ocupados:
-                ocupados.append((fila, columna))
-                return fila, columna
-
-    def generar_mapa(self):
-
-        ocupados = []
-        obstaculos = CANT_OBSTACULOS
-
-        rene_fila, rene_columna = self.posicion_aleatoria(ocupados)
-        self.mapa[rene_fila][rene_columna] = "R"  # Rene
-
-        elmo_fila, elmo_columna = self.posicion_aleatoria(ocupados)
-        self.mapa[elmo_fila][elmo_columna] = "E"  # Elmo
-
-        piggy_fila, piggy_columna = self.posicion_aleatoria(ocupados)
-        self.mapa[piggy_fila][piggy_columna] = "P"  # Piggy
-
-        galleta_fila, galleta_columna = self.posicion_aleatoria(ocupados)
-        self.mapa[galleta_fila][galleta_columna] = "G"  # Galleta
-
-        for i in range(obstaculos):
-            obstaculo_fila, obstaculo_columna = self.posicion_aleatoria(
-                ocupados)
-            self.mapa[obstaculo_fila][obstaculo_columna] = 1  # Obstaculo
-
-        rene_pos = (rene_fila, rene_columna)
-        piggy_pos = (piggy_fila, piggy_columna)
-        elmo_pos = (elmo_fila, elmo_columna)
-        galleta_pos = (galleta_fila, galleta_columna)
-
-        return self.mapa, rene_pos, piggy_pos, elmo_pos, galleta_pos
-
-    def set_mapa(self, mapa):
-        self.mapa = self.generar_mapa()
-
-    def mover_agente(self, pos_nueva, agente, elmo_pos, pos_anterior, galleta_pos):
-        if not pos_anterior:
-            for i in range(len(self.mapa)):
-                for j in range(len(self.mapa[i])):
-                    if self.mapa[i][j] == agente:
-                        self.mapa[i][j] = 0
-        else:
-            if pos_anterior == elmo_pos:
-                for i in range(len(self.mapa)):
-                    for j in range(len(self.mapa[i])):
-                        if self.mapa[i][j] == agente:
-                            self.mapa[i][j] = "E"
-            elif agente == "R" and pos_anterior == galleta_pos:
-                for i in range(len(self.mapa)):
-                    for j in range(len(self.mapa[i])):
-                        if self.mapa[i][j] == agente:
-                            self.mapa[i][j] = "G"
-            else:
-                for i in range(len(self.mapa)):
-                    for j in range(len(self.mapa[i])):
-                        if self.mapa[i][j] == agente:
-                            self.mapa[i][j] = 0
-        if pos_nueva:
-            self.mapa[pos_nueva[0]][pos_nueva[1]] = agente
-
-    def cargar_imagenes(self):
-        imagen_rene = pygame.image.load(RUTA_IMAGENES + 'imagen1.png')
-        imagen_elmo = pygame.image.load(RUTA_IMAGENES + 'imagen2.png')
-        imagen_piggy = pygame.image.load(RUTA_IMAGENES + 'imagen3.png')
-        imagen_galleta = pygame.image.load(RUTA_IMAGENES + 'imagen4.png')
-        imagen_obstaculo = pygame.image.load(RUTA_IMAGENES + 'obstaculo1.png')
-        imagen_camino = pygame.image.load(RUTA_IMAGENES + 'camino.png')
-
-        tamaño_imagen = (self.celda_ancho, self.celda_alto)
-        self.rene = pygame.transform.scale(imagen_rene, tamaño_imagen)
-        self.elmo = pygame.transform.scale(imagen_elmo, tamaño_imagen)
-        self.piggy = pygame.transform.scale(imagen_piggy, tamaño_imagen)
-        self.galleta = pygame.transform.scale(imagen_galleta, tamaño_imagen)
-        self.obstaculo = pygame.transform.scale(
-            imagen_obstaculo, tamaño_imagen)
-        self.camino = pygame.transform.scale(imagen_camino, tamaño_imagen)
-
-    def dibujar(self, ventana):
-        for fila in range(len(self.mapa)):
-            for columna in range(len(self.mapa[0])):
-                x = columna * self.celda_ancho
-                y = fila * self.celda_alto
-
-                if self.mapa[fila][columna] == "R":
-                    ventana.blit(self.rene, (x, y))  # Rana René
-                elif self.mapa[fila][columna] == "E":
-                    ventana.blit(self.elmo, (x, y))  # Elmo
-                elif self.mapa[fila][columna] == "P":
-                    ventana.blit(self.piggy, (x, y))  # Piggy
-                elif self.mapa[fila][columna] == "G":
-                    ventana.blit(self.galleta, (x, y))  # Galleta
-                elif self.mapa[fila][columna] == 1:
-                    ventana.blit(self.obstaculo, (x, y))  # Obstáculo
-                elif self.mapa[fila][columna] == 0:
-                    ventana.blit(self.camino, (x, y))  # Espacio vacío
-
+laberinto = Laberinto(ANCHO, ALTO)
 
 def welcome():
-    fondo = pygame.image.load(RUTA_IMAGENES + 'fondo_bienvenida.png')
+    fondo = pygame.image.load('images/fondo_bienvenida.png')
     fondo = pygame.transform.scale(fondo, (ANCHO, ALTO))
-
+    
+    text_label = "Laberinto Random"
     play_button = pygame.rect.Rect(ANCHO // 2 - 50, ALTO // 2 - 25, 100, 50)
 
+    
+    
     while True:
+        keys = pygame.key.get_pressed()
+        
+        if keys[pygame.K_1]:
+            laberinto.set_mapa(Maze.MAZE_A)
+            text_label = "Laberinto A: el laberinto del Enunciado"
+        elif keys[pygame.K_2]:
+            laberinto.set_mapa(Maze.MAZE_B)
+            text_label = "Laberinto B: Rene encuentra a Elmo"
+        elif keys[pygame.K_3]:
+            text_label = "Laberinto C: Piggy encuentra a Rene"
+            laberinto.set_mapa(Maze.MAZE_C)
+        elif keys[pygame.K_4]:
+            text_label = "Laberinto D: Rene atascado"
+            laberinto.set_mapa(Maze.MAZE_D)
+        elif keys[pygame.K_0]:
+            text_label = "Laberinto Random"
+            laberinto.set_mapa(None)
+        
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-                pygame.quit()
+                pygame.quit()                
                 return False
             if evento.type == pygame.MOUSEBUTTONDOWN:
                 if play_button.collidepoint(evento.pos):
@@ -159,17 +69,27 @@ def welcome():
 
         shadow_rect = pygame.rect.Rect(
             play_button.left + shadow_offset, play_button.top + shadow_offset, play_button.width, play_button.height)
+        
+        font = pygame.font.Font(None, 20)
+        text_surface = font.render(text_label, True, (255,255,255))
+        text_x = (ANCHO - text_surface.get_width()) // 2
+        text_y = ALTO - text_surface.get_height() - 10
+        background_rect = pygame.Rect(text_x - 10, text_y - 5, text_surface.get_width() + 20, text_surface.get_height() + 10)
+        
         pygame.draw.rect(VENTANA, (50, 50, 50), shadow_rect, border_radius=10)
         pygame.draw.rect(VENTANA, button_color, play_button, border_radius=10)
-
+        pygame.draw.rect(VENTANA, (0, 0, 0), background_rect)
+        
         font = pygame.font.Font(None, 40)
         text = font.render("Jugar", True, NEGRO)
         VENTANA.blit(text, (play_button.x + 20, play_button.y + 10))
 
+        VENTANA.blit(text_surface, (text_x, text_y))
+
         pygame.display.flip()
 
 def end_game(text="El juego ha terminado"):
-    fondo = pygame.image.load(RUTA_IMAGENES + 'game-over.jpeg')
+    fondo = pygame.image.load('images/game-over.jpeg')
     fondo = pygame.transform.scale(fondo, (ANCHO, ALTO))
     font = pygame.font.Font(None, 40)
     text_surface = font.render(text, True, (255, 255, 255))  # White color
@@ -205,9 +125,11 @@ def juego():
         laberinto.dibujar(VENTANA)
         pygame.display.flip()
 
-    # Creacion del laberinto 5x5 con todas las pocisiones en 0 que indican el camino libre
-    laberinto = Laberinto([[0 for _ in range(5)] for _ in range(5)])
-    mapa_aleatorio, rene_pos, piggy_pos, elmo_pos, galleta_pos = laberinto.generar_mapa()
+    if laberinto.mapa == None: 
+        laberinto.set_mapa([[0 for _ in range(5)] for _ in range(5)])
+        laberinto.generar_mapa()
+    
+    rene_pos, piggy_pos, elmo_pos, galleta_pos = laberinto.get_positions()
     dibujar_mapa()
 
     rene_pos_anterior = None
