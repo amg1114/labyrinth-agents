@@ -66,7 +66,7 @@ class Laberinto:
         return self.mapa, rene_pos, piggy_pos, elmo_pos, galleta_pos
 
     def set_mapa(self, mapa):
-        self.mapa = generar_mapa()
+        self.mapa = self.generar_mapa()
 
     def mover_agente(self, pos_nueva, agente, elmo_pos, pos_anterior, galleta_pos):
         if not pos_anterior:
@@ -141,6 +141,7 @@ def welcome():
             if evento.type == pygame.QUIT:
                 pygame.quit()
                 quit()
+                pygame.quit()
                 return False
             if evento.type == pygame.MOUSEBUTTONDOWN:
                 if play_button.collidepoint(evento.pos):
@@ -167,17 +168,42 @@ def welcome():
 
         pygame.display.flip()
 
+def end_game(text="El juego ha terminado"):
+    fondo = pygame.image.load(RUTA_IMAGENES + 'game-over.jpeg')
+    fondo = pygame.transform.scale(fondo, (ANCHO, ALTO))
+    font = pygame.font.Font(None, 40)
+    text_surface = font.render(text, True, (255, 255, 255))  # White color
 
+    # Calculate text position
+    text_x = (ANCHO - text_surface.get_width()) // 2
+    text_y = ALTO - text_surface.get_height() - 10
+
+    # Define background rectangle
+    background_rect = pygame.Rect(
+        text_x - 10, text_y - 5, text_surface.get_width() + 20, text_surface.get_height() + 10)
+
+    while True:
+        for evento in pygame.event.get():
+            if evento.type == pygame.QUIT:
+                pygame.quit()
+                return False
+
+        VENTANA.blit(fondo, (0, 0))
+
+        # Draw background rectangle
+        pygame.draw.rect(VENTANA, (0, 0, 0), background_rect)  # Black background
+
+        # Blit text surface
+        VENTANA.blit(text_surface, (text_x, text_y))
+
+        pygame.display.flip()
+
+    
 def juego():
-
     def dibujar_mapa():
         VENTANA.fill(NEGRO)
         laberinto.dibujar(VENTANA)
         pygame.display.flip()
-
-    def cerrar():
-        pygame.quit()
-        quit()
 
     # Creacion del laberinto 5x5 con todas las pocisiones en 0 que indican el camino libre
     laberinto = Laberinto([[0 for _ in range(5)] for _ in range(5)])
@@ -196,17 +222,16 @@ def juego():
 
     turno = rene
     while True:
-
+        sleep(1)
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
-                cerrar()
+               quit()
 
-        if piggy.find_rene or not rene_path:
-            print("Costo Acumulado de piggy", costo_acumulado_piggy)
-            cerrar()
-
+        if not  rene_path:
+            end_game("Rene y Elmo se encontraron")
+        elif piggy.find_rene:
+            end_game("Piggy y Rene se encontraron")
         elif turno == piggy:
-
             if not piggy.find_rene:
 
                 piggy_pos_anterior = piggy_pos
@@ -217,12 +242,10 @@ def juego():
                 laberinto.mover_agente(
                     piggy_pos, "P", elmo_pos, piggy_pos_anterior, galleta_pos)
 
-                sleep(1)
-
             turno = rene
-
         elif turno == rene and rene_path:
-
+            print("Mueve Rene")
+            
             rene_pos_anterior = rene_pos
             rene_pos = rene_path.popleft()
 
@@ -230,19 +253,11 @@ def juego():
                 rene_pos, "R", elmo_pos, rene_pos_anterior, galleta_pos)
 
             turno = piggy
-            print("Mueve Rene")
-            sleep(1)
-
             if piggy_pos == rene_pos:
-                dibujar_mapa()
-                print("Ups... Rene se encontro con piggy")
-                print("Costo Acumulado de piggy", costo_acumulado_piggy)
-                cerrar()
+                piggy.find_rene = True 
 
+        print("Costo Acumulado de piggy", costo_acumulado_piggy)
         dibujar_mapa()
-
-    cerrar()
-
 
 if welcome():
     juego()
