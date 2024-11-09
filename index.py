@@ -58,14 +58,17 @@ class Laberinto:
                 ocupados)
             self.mapa[obstaculo_fila][obstaculo_columna] = 1  # Obstaculo
 
+        rene_pos = (rene_fila, rene_columna)
+        piggy_pos = (piggy_fila, piggy_columna)
         elmo_pos = (elmo_fila, elmo_columna)
+        galleta_pos = (galleta_fila, galleta_columna)
 
-        return self.mapa, rene_fila, rene_columna, piggy_fila, piggy_columna, elmo_pos
+        return self.mapa, rene_pos, piggy_pos, elmo_pos, galleta_pos
 
     def set_mapa(self, mapa):
         self.mapa = generar_mapa()
 
-    def mover_agente(self, pos_nueva, agente, elmo_pos, pos_anterior):
+    def mover_agente(self, pos_nueva, agente, elmo_pos, pos_anterior, galleta_pos):
         if not pos_anterior:
             for i in range(len(self.mapa)):
                 for j in range(len(self.mapa[i])):
@@ -77,6 +80,11 @@ class Laberinto:
                     for j in range(len(self.mapa[i])):
                         if self.mapa[i][j] == agente:
                             self.mapa[i][j] = "E"
+            elif agente == "R" and pos_anterior == galleta_pos:
+                for i in range(len(self.mapa)):
+                    for j in range(len(self.mapa[i])):
+                        if self.mapa[i][j] == agente:
+                            self.mapa[i][j] = "G"
             else:
                 for i in range(len(self.mapa)):
                     for j in range(len(self.mapa[i])):
@@ -161,50 +169,53 @@ def welcome():
 
 
 def juego():
-    costo_acumulado = 0
-    pygame.display.flip()
 
+    def dibujar_mapa():
+        VENTANA.fill(NEGRO)
+        laberinto.dibujar(VENTANA)
+        pygame.display.flip()
+
+    def cerrar():
+        pygame.quit()
+        quit()
+
+    # Creacion del laberinto 5x5 con todas las pocisiones en 0 que indican el camino libre
     laberinto = Laberinto([[0 for _ in range(5)] for _ in range(5)])
-    mapa_aleatorio, rene_fila, rene_columna, piggy_fila, piggy_columna, elmo_pos = laberinto.generar_mapa()
+    mapa_aleatorio, rene_pos, piggy_pos, elmo_pos, galleta_pos = laberinto.generar_mapa()
+    dibujar_mapa()
 
-    rene = Rene((rene_fila, rene_columna))
-    piggy = Piggy((piggy_fila, piggy_columna))
-
-    turno = rene
-    rene_pos = None
     rene_pos_anterior = None
-    piggy_pos = None
     piggy_pos_anterior = None
+
+    rene = Rene(rene_pos)
+    piggy = Piggy(piggy_pos)
+    costo_acumulado_piggy = 0
 
     rene_path = deque(rene.get_path(laberinto.mapa))
     rene_path.popleft()
 
-    VENTANA.fill(NEGRO)
-    laberinto.dibujar(VENTANA)
-    pygame.display.flip()
-
+    turno = rene
     while True:
 
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
-                pygame.quit()
-                quit()
+                cerrar()
 
         if piggy.find_rene or not rene_path:
-            print("Costo Acumulado de piggy", costo_acumulado)
-            pygame.quit()
-            quit()
+            print("Costo Acumulado de piggy", costo_acumulado_piggy)
+            cerrar()
 
         elif turno == piggy:
 
             if not piggy.find_rene:
+
                 piggy_pos_anterior = piggy_pos
                 movimiento, costo = piggy.move(rene_pos, laberinto.mapa)
-                costo_acumulado += costo
+                costo_acumulado_piggy += costo
                 piggy_pos = movimiento
 
                 laberinto.mover_agente(
-                    piggy_pos, "P", elmo_pos, piggy_pos_anterior)
+                    piggy_pos, "P", elmo_pos, piggy_pos_anterior, galleta_pos)
 
                 sleep(1)
 
@@ -215,25 +226,22 @@ def juego():
             rene_pos_anterior = rene_pos
             rene_pos = rene_path.popleft()
 
-            laberinto.mover_agente(rene_pos, "R", elmo_pos, rene_pos_anterior)
+            laberinto.mover_agente(
+                rene_pos, "R", elmo_pos, rene_pos_anterior, galleta_pos)
 
             turno = piggy
             print("Mueve Rene")
             sleep(1)
 
             if piggy_pos == rene_pos:
-                VENTANA.fill(NEGRO)
-                laberinto.dibujar(VENTANA)
-                pygame.display.flip()
+                dibujar_mapa()
                 print("Ups... Rene se encontro con piggy")
-                pygame.quit()
-                quit()
+                print("Costo Acumulado de piggy", costo_acumulado_piggy)
+                cerrar()
 
-        VENTANA.fill(NEGRO)
-        laberinto.dibujar(VENTANA)
-        pygame.display.flip()
+        dibujar_mapa()
 
-    pygame.quit()
+    cerrar()
 
 
 if welcome():

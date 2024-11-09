@@ -11,10 +11,7 @@ def a_star_search(start, goal, grid, movimientos, self):
 
     open_list = []
     closed_list = set()
-
-    costo = 0
     camino = []
-
     g_score = {start: 0}
 
     start_node = Node(start, None, 0, heuristic(start, goal))
@@ -38,19 +35,12 @@ def a_star_search(start, goal, grid, movimientos, self):
 
             camino = path[::-1]
 
-            if len(camino) > 1:
-                next_step = camino[1]
-                if next_step == goal:
-                    costo = g_score[goal]
-                else:
-                    costo = g_score[next_step]
-
             next_step = camino[1]
             if grid[next_step[0]][next_step[1]] == "G":
                 self.find_galleta = True
                 print("Piggy encontro la galleta!!!!")
 
-            return camino, costo
+            return camino
 
         # Explorar vecinos
         for dx, dy in movimientos:
@@ -79,4 +69,4 @@ def a_star_search(start, goal, grid, movimientos, self):
                 g_score[neighbor_pos] = g
                 heapq.heappush(open_list, neighbor_node)
 
-    return camino, costo  # No se encontró camino
+    return camino
