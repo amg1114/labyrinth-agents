@@ -6,6 +6,8 @@ from time import sleep
 from classes.Agente import Piggy, Rene
 from classes.Laberinto import Laberinto
 
+from constants import Maze
+
 pygame.init()
 
 ANCHO = 500
@@ -14,20 +16,42 @@ NEGRO = (0, 0, 0)
 BLANCO = (255, 255, 255)
 VENTANA = pygame.display.set_mode((ANCHO, ALTO))
 
+
 pygame.display.set_caption('Pacman versión Univalle')
+
+laberinto = Laberinto(ANCHO, ALTO)
 
 def welcome():
     fondo = pygame.image.load('images/fondo_bienvenida.png')
     fondo = pygame.transform.scale(fondo, (ANCHO, ALTO))
-
+    
+    text_label = "Laberinto Random"
     play_button = pygame.rect.Rect(ANCHO // 2 - 50, ALTO // 2 - 25, 100, 50)
 
+    
+    
     while True:
+        keys = pygame.key.get_pressed()
+        
+        if keys[pygame.K_1]:
+            laberinto.set_mapa(Maze.MAZE_A)
+            text_label = "Laberinto A: el laberinto del Enunciado"
+        elif keys[pygame.K_2]:
+            laberinto.set_mapa(Maze.MAZE_B)
+            text_label = "Laberinto B: Rene encuentra a Elmo"
+        elif keys[pygame.K_3]:
+            text_label = "Laberinto C: Piggy encuentra a Rene"
+            laberinto.set_mapa(Maze.MAZE_C)
+        elif keys[pygame.K_4]:
+            text_label = "Laberinto D: Rene atascado"
+            laberinto.set_mapa(Maze.MAZE_D)
+        elif keys[pygame.K_0]:
+            text_label = "Laberinto Random"
+            laberinto.set_mapa(None)
+        
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-                pygame.quit()
+                pygame.quit()                
                 return False
             if evento.type == pygame.MOUSEBUTTONDOWN:
                 if play_button.collidepoint(evento.pos):
@@ -45,12 +69,22 @@ def welcome():
 
         shadow_rect = pygame.rect.Rect(
             play_button.left + shadow_offset, play_button.top + shadow_offset, play_button.width, play_button.height)
+        
+        font = pygame.font.Font(None, 20)
+        text_surface = font.render(text_label, True, (255,255,255))
+        text_x = (ANCHO - text_surface.get_width()) // 2
+        text_y = ALTO - text_surface.get_height() - 10
+        background_rect = pygame.Rect(text_x - 10, text_y - 5, text_surface.get_width() + 20, text_surface.get_height() + 10)
+        
         pygame.draw.rect(VENTANA, (50, 50, 50), shadow_rect, border_radius=10)
         pygame.draw.rect(VENTANA, button_color, play_button, border_radius=10)
-
+        pygame.draw.rect(VENTANA, (0, 0, 0), background_rect)
+        
         font = pygame.font.Font(None, 40)
         text = font.render("Jugar", True, NEGRO)
         VENTANA.blit(text, (play_button.x + 20, play_button.y + 10))
+
+        VENTANA.blit(text_surface, (text_x, text_y))
 
         pygame.display.flip()
 
@@ -91,10 +125,11 @@ def juego():
         laberinto.dibujar(VENTANA)
         pygame.display.flip()
 
-    # Creacion del laberinto 5x5 con todas las pocisiones en 0 que indican el camino libre
-    laberinto = Laberinto([[0 for _ in range(5)] for _ in range(5)], ANCHO, ALTO)
+    if laberinto.mapa == None: 
+        laberinto.set_mapa([[0 for _ in range(5)] for _ in range(5)])
+        laberinto.generar_mapa()
     
-    mapa_aleatorio, rene_pos, piggy_pos, elmo_pos, galleta_pos = laberinto.generar_mapa()
+    rene_pos, piggy_pos, elmo_pos, galleta_pos = laberinto.get_positions()
     dibujar_mapa()
 
     rene_pos_anterior = None
