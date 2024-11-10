@@ -139,26 +139,45 @@ def juego():
     piggy = Piggy(piggy_pos)
     costo_acumulado_piggy = 0
 
-    rene_path = deque(rene.get_path(laberinto.mapa))
-    rene_path.popleft()
-
-    turno = rene
+    
+    rene_path = rene.get_path(laberinto.mapa)
+    if rene.has_path:
+        rene_path = deque(rene_path)
+        rene_path.popleft()
+        turno = rene
+    else:
+        turno = piggy    
+    
     while True:
         sleep(1)
+        
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
                quit()
 
-        if not  rene_path:
+        if rene.has_path and len(rene_path) == 0:
             end_game("Rene y Elmo se encontraron")
-        elif piggy.find_rene:
+            return
+        elif not rene.has_path :
+            turno = piggy
+                    
+        if piggy.find_rene:
             end_game("Piggy y Rene se encontraron")
-        elif turno == piggy:
+            return
+        
+        print("turno", turno)
+        if turno == piggy:
             if not piggy.find_rene:
 
                 piggy_pos_anterior = piggy_pos
                 movimiento, costo = piggy.move(rene_pos, laberinto.mapa)
                 costo_acumulado_piggy += costo
+                
+                if not rene.has_path and movimiento == piggy_pos_anterior:
+                    print("Movimiento", movimiento)
+                    print("pos", piggy_pos_anterior)
+                    end_game("Los agentes no tienen caminos")
+                
                 piggy_pos = movimiento
 
                 laberinto.mover_agente(

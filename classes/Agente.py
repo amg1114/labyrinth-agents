@@ -73,11 +73,16 @@ class Piggy(Agente):
 
 
 class Rene(Agente):
+    def __init__ (self, position):
+        self.has_path = True
+        
+        super().__init__(position)
     def get_path(self, grid):
         ruta = deep_search(self.position, grid, self.movimientos)
 
         if ruta:
             return ruta
         else:
-            print("No hay camino encontrado")
+            print("Rene no encontro camino")
+            self.has_path = False
             return None
