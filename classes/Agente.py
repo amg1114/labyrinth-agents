@@ -28,7 +28,7 @@ class Piggy(Agente):
         super().__init__(position)
 
     def move(self, goal_position, grid):
-        costo = 0
+        costo = 1
         if self.position == goal_position:
             self.find_rene = True
             print("¡Piggy ha encontrado a René!")
@@ -40,10 +40,13 @@ class Piggy(Agente):
             print("Moviendo a Piggy usando A*")
             path = a_star_search(
                 self.position, goal_position, grid, self.movimientos, self)
+            self.position = path[1][0]
+            costo = path[1][1]
         else:
             print("Moviendo a Piggy usando BFS")
             path = bfs(self.position, goal_position,
                        grid, self.movimientos, self)
+            self.position = path[1]
 
         if not path:
             print("No hay camino encontrado")
@@ -51,8 +54,6 @@ class Piggy(Agente):
 
 
         try:
-            self.position = path[1][0]
-            costo = path[1][1]
             
             if self.position == goal_position:
                 self.find_rene = True
