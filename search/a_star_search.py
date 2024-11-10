@@ -35,12 +35,12 @@ def a_star_search(start, goal, grid, movimientos, self):
 
             camino = path[::-1]
 
-            next_step = camino[1]
-            if grid[next_step[0]][next_step[1]] == "G":
-                self.find_galleta = True
-                print("Piggy encontro la galleta!!!!")
 
             return camino
+
+        if cell == "G":
+            self.find_galleta = True
+            print("Piggy encontro la galleta!!!!")
 
         # Explorar vecinos
         for dx, dy in movimientos:
