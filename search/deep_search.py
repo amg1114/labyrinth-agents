@@ -25,14 +25,16 @@ def deep_search(position, grid, movimientos):
 
         if iteracion < limit:
             for movimiento in movimientos[::-1]:
+                prev_node = current_node.parent
                 x = coordenadas[0] + movimiento[0]
                 y = coordenadas[1] + movimiento[1]
 
                 # Chequear si las coordenadas son válidas y no son un bloque
                 x_valido = 0 <= x < filas
                 y_valido = 0 <= y < columnas
-
-                if x_valido and y_valido:
+                is_prev = prev_node and (x, y) == prev_node.position
+                
+                if x_valido and y_valido and not is_prev:
                     nueva_celda = grid[x][y]
                     if nueva_celda != 1:
                         # Agregar a la pila para explorar en la siguiente iteración
