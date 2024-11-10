@@ -174,9 +174,8 @@ def juego():
                 costo_acumulado_piggy += costo
                 
                 if not rene.has_path and movimiento == piggy_pos_anterior:
-                    print("Movimiento", movimiento)
-                    print("pos", piggy_pos_anterior)
                     end_game("Los agentes no tienen caminos")
+                    return
                 
                 piggy_pos = movimiento
 
