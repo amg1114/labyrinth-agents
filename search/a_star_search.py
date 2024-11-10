@@ -30,7 +30,7 @@ def a_star_search(start, goal, grid, movimientos, self):
         if cell == "R" or current_node.position == goal:
             path = []
             while current_node:
-                path.append(current_node.position)
+                path.append((current_node.position, current_node.c))
                 current_node = current_node.parent
 
             camino = path[::-1]
@@ -39,8 +39,7 @@ def a_star_search(start, goal, grid, movimientos, self):
             return camino
 
         if cell == "G":
-            self.find_galleta = True
-            print("Piggy encontro la galleta!!!!")
+            self.find_galleta = 2
 
         # Explorar vecinos
         for dx, dy in movimientos:
@@ -54,14 +53,16 @@ def a_star_search(start, goal, grid, movimientos, self):
             if (0 <= neighbor_pos[0] < len(grid) and
                 0 <= neighbor_pos[1] < len(grid[0]) and
                     grid[neighbor_pos[0]][neighbor_pos[1]] != 1):
-
-                if self.find_galleta:
-                    g = current_node.g + 0.5
-                else:
-                    g = current_node.g + 1
-
+                
+                cell_cost = 1
+                if self.find_galleta > 0:
+                    cell_cost = 0.5
+                    self.find_galleta -= 1
+                    
+                g = current_node.g + cell_cost
                 h = heuristic(neighbor_pos, goal)
-                neighbor_node = Node(neighbor_pos, current_node, g, h)
+                
+                neighbor_node = Node(neighbor_pos, current_node, cell_cost, g, h)
 
                 if neighbor_pos in g_score and g >= g_score[neighbor_pos]:
                     continue

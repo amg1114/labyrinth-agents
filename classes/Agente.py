@@ -34,10 +34,7 @@ class Piggy(Agente):
             print("¡Piggy ha encontrado a René!")
             return self.position
 
-        if random.random() < 0.4:
-            self.use_a_star = True
-        else:
-            self.use_a_star = False
+        self.use_a_star = random.random() < 0.4
 
         if self.use_a_star:
             print("Moviendo a Piggy usando A*")
@@ -52,18 +49,17 @@ class Piggy(Agente):
             print("No hay camino encontrado")
             return self.position, costo
 
-        if self.find_galleta:
-            costo = 0.5
-        else:
-            costo = 1
 
         try:
-            self.position = path[1]
-
+            self.position = path[1][0]
+            costo = path[1][1]
+            
             if self.position == goal_position:
                 self.find_rene = True
                 print("¡Piggy ha encontrado a René!")
-
+            elif grid[self.position[0]][self.position[1]] == "G":
+                print("¡Piggy ha encontrado la galleta!")
+                
             return self.position, costo
 
         except IndexError:
