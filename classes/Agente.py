@@ -40,34 +40,31 @@ class Piggy(Agente):
             print("Moviendo a Piggy usando A*")
             path = a_star_search(
                 self.position, goal_position, grid, self.movimientos, self)
-            self.position = path[1][0]
-            costo = path[1][1]
+            try:
+                self.position = path[1][0]
+                costo = path[1][1]
+            except IndexError:
+                costo = 0
+                return self.position, costo
         else:
             print("Moviendo a Piggy usando BFS")
             path = bfs(self.position, goal_position,
                        grid, self.movimientos, self)
-            self.position = path[1]
-
+            try:
+                self.position = path[1]
+            except IndexError:
+                costo = 0
+                return self.position, costo
         if not path:
-            print("No hay camino encontrado")
             return self.position, costo
-
-
-        try:
             
-            if self.position == goal_position:
-                self.find_rene = True
-                print("¡Piggy ha encontrado a René!")
-            elif grid[self.position[0]][self.position[1]] == "G":
-                print("¡Piggy ha encontrado la galleta!")
-                
-            return self.position, costo
-
-        except IndexError:
-            print("Error en el movimiento de Piggy, manteniendo posición actual.")
-            costo = 0
-            return self.position, costo
-
+        if self.position == goal_position:
+            self.find_rene = True
+            print("¡Piggy ha encontrado a René!")
+        elif grid[self.position[0]][self.position[1]] == "G":
+            print("¡Piggy ha encontrado la galleta!")
+            
+        return self.position, costo
 
 class Rene(Agente):
     def __init__ (self, position):
