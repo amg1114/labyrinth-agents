@@ -2,15 +2,13 @@ import random
 import pygame
 class Laberinto:
     def __init__(self, ancho, alto, mapa = None):
-        self.filas = 5
-        self.columnas = 5
         self.cant_obstaculos = 5
-        
-        self.celda_ancho = ancho // self.columnas
-        self.celda_alto = alto // self.filas
-        
         self.mapa = mapa
-        self.cargar_imagenes()
+        self.ancho = ancho
+        self.alto = alto
+        if mapa:
+            
+            self.config_cell_size()
         
     def posicion_aleatoria(self, ocupados):
         while True:
@@ -23,8 +21,17 @@ class Laberinto:
     def set_mapa(self, mapa):
         self.mapa = mapa
         if mapa:
-            self.filas = len(mapa)
-            self.columnas = len(mapa[0])
+            self.config_cell_size()
+    
+    def config_cell_size(self):
+        self.filas = len(self.mapa)
+        self.columnas = len(self.mapa[0])
+            
+        self.celda_ancho = self.ancho // self.columnas
+        self.celda_alto = self.alto // self.filas
+        
+        self.cargar_imagenes()
+            
     def get_positions(self):
         rene_pos = None
         piggy_pos = None
