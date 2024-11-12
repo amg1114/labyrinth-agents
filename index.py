@@ -21,18 +21,17 @@ pygame.display.set_caption('Pacman versión Univalle')
 
 laberinto = Laberinto(ANCHO, ALTO)
 
+
 def welcome():
     fondo = pygame.image.load('images/fondo_bienvenida.png')
     fondo = pygame.transform.scale(fondo, (ANCHO, ALTO))
-    
+
     text_label = "Laberinto Random"
     play_button = pygame.rect.Rect(ANCHO // 2 - 50, ALTO // 2 - 25, 100, 50)
 
-    
-    
     while True:
         keys = pygame.key.get_pressed()
-        
+
         if keys[pygame.K_1]:
             laberinto.set_mapa(Maze.MAZE_A)
             text_label = "Laberinto A: el laberinto del Enunciado"
@@ -48,10 +47,10 @@ def welcome():
         elif keys[pygame.K_0]:
             text_label = "Laberinto Random"
             laberinto.set_mapa(None)
-        
+
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
-                pygame.quit()                
+                pygame.quit()
                 return False
             if evento.type == pygame.MOUSEBUTTONDOWN:
                 if play_button.collidepoint(evento.pos):
@@ -69,17 +68,18 @@ def welcome():
 
         shadow_rect = pygame.rect.Rect(
             play_button.left + shadow_offset, play_button.top + shadow_offset, play_button.width, play_button.height)
-        
+
         font = pygame.font.Font(None, 20)
-        text_surface = font.render(text_label, True, (255,255,255))
+        text_surface = font.render(text_label, True, (255, 255, 255))
         text_x = (ANCHO - text_surface.get_width()) // 2
         text_y = ALTO - text_surface.get_height() - 10
-        background_rect = pygame.Rect(text_x - 10, text_y - 5, text_surface.get_width() + 20, text_surface.get_height() + 10)
-        
+        background_rect = pygame.Rect(
+            text_x - 10, text_y - 5, text_surface.get_width() + 20, text_surface.get_height() + 10)
+
         pygame.draw.rect(VENTANA, (50, 50, 50), shadow_rect, border_radius=10)
         pygame.draw.rect(VENTANA, button_color, play_button, border_radius=10)
         pygame.draw.rect(VENTANA, (0, 0, 0), background_rect)
-        
+
         font = pygame.font.Font(None, 40)
         text = font.render("Jugar", True, NEGRO)
         VENTANA.blit(text, (play_button.x + 20, play_button.y + 10))
@@ -87,6 +87,7 @@ def welcome():
         VENTANA.blit(text_surface, (text_x, text_y))
 
         pygame.display.flip()
+
 
 def end_game(text="El juego ha terminado"):
     fondo = pygame.image.load('images/game-over.jpeg')
@@ -111,24 +112,25 @@ def end_game(text="El juego ha terminado"):
         VENTANA.blit(fondo, (0, 0))
 
         # Draw background rectangle
-        pygame.draw.rect(VENTANA, (0, 0, 0), background_rect)  # Black background
+        # Black background
+        pygame.draw.rect(VENTANA, (0, 0, 0), background_rect)
 
         # Blit text surface
         VENTANA.blit(text_surface, (text_x, text_y))
 
         pygame.display.flip()
 
-    
+
 def juego():
     def dibujar_mapa():
         VENTANA.fill(NEGRO)
         laberinto.dibujar(VENTANA)
         pygame.display.flip()
 
-    if laberinto.mapa == None: 
+    if laberinto.mapa == None:
         laberinto.set_mapa([[0 for _ in range(5)] for _ in range(5)])
         laberinto.generar_mapa()
-    
+
     rene_pos, piggy_pos, elmo_pos, galleta_pos = laberinto.get_positions()
     dibujar_mapa()
 
@@ -139,32 +141,31 @@ def juego():
     piggy = Piggy(piggy_pos)
     costo_acumulado_piggy = 0
 
-    
     rene_path = rene.get_path(laberinto.mapa)
     if rene.has_path:
         rene_path = deque(rene_path)
         rene_path.popleft()
         turno = rene
     else:
-        turno = piggy    
-    
+        turno = piggy
+
     while True:
         sleep(1)
-        
+
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
-               quit()
+                quit()
 
         if rene.has_path and len(rene_path) == 0:
             end_game("Rene y Elmo se encontraron")
             return
-        elif not rene.has_path :
+        elif not rene.has_path:
             turno = piggy
-                    
+
         if piggy.find_rene:
             end_game("Piggy y Rene se encontraron")
             return
-        
+
         print("turno", turno)
         if turno == piggy:
             if not piggy.find_rene:
@@ -172,32 +173,33 @@ def juego():
                 piggy_pos_anterior = piggy_pos
                 movimiento, costo = piggy.move(rene_pos, laberinto.mapa)
                 costo_acumulado_piggy += costo
-                
+
                 if not rene.has_path and movimiento == piggy_pos_anterior:
                     end_game("Los agentes no tienen caminos")
                     return
-                
+
                 piggy_pos = movimiento
 
                 laberinto.mover_agente(
-                    piggy_pos, "P", elmo_pos, piggy_pos_anterior, galleta_pos)
+                    piggy_pos, "P", elmo_pos, piggy_pos_anterior, galleta_pos, piggy.find_galleta)
 
             turno = rene
         elif turno == rene and rene_path:
             print("Mueve Rene")
-            
+
             rene_pos_anterior = rene_pos
             rene_pos = rene_path.popleft()
 
             laberinto.mover_agente(
-                rene_pos, "R", elmo_pos, rene_pos_anterior, galleta_pos)
+                rene_pos, "R", elmo_pos, rene_pos_anterior, galleta_pos, piggy.find_galleta)
 
             turno = piggy
             if piggy_pos == rene_pos:
-                piggy.find_rene = True 
+                piggy.find_rene = True
 
         print("Costo Acumulado de piggy", costo_acumulado_piggy)
         dibujar_mapa()
+
 
 if welcome():
     juego()
