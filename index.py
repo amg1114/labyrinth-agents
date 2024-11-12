@@ -44,12 +44,6 @@ def welcome():
         elif keys[pygame.K_4]:
             text_label = "Laberinto D: Rene atascado"
             laberinto.set_mapa(Maze.MAZE_D)
-        elif keys[pygame.K_5]:
-            text_label = "Laberinto D: Prueba Galleta"
-            laberinto.set_mapa(Maze.MAZE_E)
-        elif keys[pygame.K_6]:
-            text_label = "Laberinto D: Prueba Galleta 2"
-            laberinto.set_mapa(Maze.MAZE_F)
         elif keys[pygame.K_0]:
             text_label = "Laberinto Random"
             laberinto.set_mapa(None)
