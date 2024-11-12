@@ -1,17 +1,19 @@
 import random
 import pygame
+
+
 class Laberinto:
-    def __init__(self, ancho, alto, mapa = None):
+    def __init__(self, ancho, alto, mapa=None):
         self.filas = 5
         self.columnas = 5
         self.cant_obstaculos = 5
-        
+
         self.celda_ancho = ancho // self.columnas
         self.celda_alto = alto // self.filas
-        
+
         self.mapa = mapa
         self.cargar_imagenes()
-        
+
     def posicion_aleatoria(self, ocupados):
         while True:
             fila = random.randint(0, self.filas - 1)
@@ -25,12 +27,13 @@ class Laberinto:
         if mapa:
             self.filas = len(mapa)
             self.columnas = len(mapa[0])
+
     def get_positions(self):
         rene_pos = None
         piggy_pos = None
         elmo_pos = None
         galleta_pos = None
-        
+
         for i in range(len(self.mapa)):
             for j in range(len(self.mapa[i])):
                 if self.mapa[i][j] == "R":
@@ -41,9 +44,9 @@ class Laberinto:
                     elmo_pos = (i, j)
                 elif self.mapa[i][j] == "G":
                     galleta_pos = (i, j)
-                    
+
         return rene_pos, piggy_pos, elmo_pos, galleta_pos
-    
+
     def generar_mapa(self):
         ocupados = []
         obstaculos = self.cant_obstaculos
@@ -72,7 +75,8 @@ class Laberinto:
 
         return self.mapa, rene_pos, piggy_pos, elmo_pos, galleta_pos
 
-    def mover_agente(self, pos_nueva, agente, elmo_pos, pos_anterior, galleta_pos):
+    def mover_agente(self, pos_nueva, agente, elmo_pos, pos_anterior, galleta_pos, find_galleta):
+
         if not pos_anterior:
             for i in range(len(self.mapa)):
                 for j in range(len(self.mapa[i])):
@@ -84,7 +88,7 @@ class Laberinto:
                     for j in range(len(self.mapa[i])):
                         if self.mapa[i][j] == agente:
                             self.mapa[i][j] = "E"
-            elif agente == "R" and pos_anterior == galleta_pos:
+            elif agente == "R" and pos_anterior == galleta_pos and not find_galleta:
                 for i in range(len(self.mapa)):
                     for j in range(len(self.mapa[i])):
                         if self.mapa[i][j] == agente:
