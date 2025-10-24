@@ -1,4 +1,4 @@
-# 👾 Pacman IA
+# 👾 Labyrinth Agents
 
 Proyecto académico desarrollado para la asignatura **Introducción a la Inteligencia Artificial** en la **Universidad del Valle – Sede Tuluá**.  
 Este proyecto implementa un entorno de juego tipo Pacman donde dos **agentes inteligentes** (René y Piggy) utilizan distintos **algoritmos de búsqueda** (informada y no informada) para alcanzar sus objetivos dentro de un laberinto.
